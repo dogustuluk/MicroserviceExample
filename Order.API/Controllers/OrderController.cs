@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MassTransit;
+using Microsoft.AspNetCore.Mvc;
 using Order.API.Models;
 using Order.API.Models.Enums;
 using Order.API.ViewModels;
+using Shared.Events;
 
 namespace Order.API.Controllers;
 [Route("api/[controller]")]
@@ -9,10 +11,12 @@ namespace Order.API.Controllers;
 public class OrderController : ControllerBase
 {
     readonly AppDbContext _context;
+    readonly IPublishEndpoint _publishEndpoint;
 
-    public OrderController(AppDbContext context)
+    public OrderController(AppDbContext context, IPublishEndpoint publishEndpoint)
     {
         _context = context;
+        _publishEndpoint = publishEndpoint;
     }
 
     [HttpPost]
@@ -37,6 +41,21 @@ public class OrderController : ControllerBase
 
         await _context.AddAsync(order);
         await _context.SaveChangesAsync();
+
+        //event fırlat
+        OrderCreatedEvent orderCreatedEvent = new()
+        {
+            BuyerId = order.BuyerId,
+            OrderId = order.OrderId,
+            OrderItems = order.OrderItems.Select(a => new Shared.Messages.OrderItemMessage
+            {
+                Count = a.Count,
+                ProductId = a.ProductId
+            }).ToList()
+        };
+
+        //publish et
+        await _publishEndpoint.Publish(orderCreatedEvent);
 
         return Ok();
     }
