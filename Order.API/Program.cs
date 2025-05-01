@@ -21,6 +21,7 @@ builder.Services.AddMassTransit(configurator =>
 {
     configurator.AddConsumer<PaymentCompletedEventConsumer>();
     configurator.AddConsumer<StockNotReservedEventConsumer>();
+    configurator.AddConsumer<PaymentFailedEventConsumer>();
 
     configurator.UsingRabbitMq((context, _configurator) =>
     {
@@ -29,6 +30,8 @@ builder.Services.AddMassTransit(configurator =>
         _configurator.ReceiveEndpoint(RabbitMQSettings.Order_PaymentCompletedEventQueue, a => a.ConfigureConsumer<PaymentCompletedEventConsumer>(context));
 
         _configurator.ReceiveEndpoint(RabbitMQSettings.Order_StockNotReservedEventQueue, a => a.ConfigureConsumer<StockNotReservedEventConsumer>(context));
+
+        _configurator.ReceiveEndpoint(RabbitMQSettings.Order_PaymentFailedEventQueue, a => a.ConfigureConsumer<PaymentFailedEventConsumer>(context));
     });
 });
 

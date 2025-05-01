@@ -22,10 +22,19 @@ public class StockReservedEventConsumer : IConsumer<StockReservedEvent>
             };
 
             _publishEndpoint.Publish(paymentCompletedEvent);
+
+            Console.WriteLine("Ödeme Başarılı");
         }
         else
         {
+            PaymentFailedEvent paymentFailedEvent = new()
+            {
+                OrderId = context.Message.OrderId,
+                Message = "Ödeme İşlemi Başarısız"
+            };
+            _publishEndpoint.Publish(paymentFailedEvent);
 
+            Console.WriteLine("Ödeme Başarısız");
         }
 
         return Task.CompletedTask;

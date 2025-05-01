@@ -51,7 +51,7 @@ public class OrderCreatedEventConsumer : IConsumer<OrderCreatedEvent>
             //burada publish yerine send tipini kullaniyoruz cunku burada direkt kuyruk bazli bir modelleme yapiyoruz; sadece bu kuyrugu dinleyenler yakalayabilir bu eventi
             ISendEndpoint sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri($"queue:{RabbitMQSettings.Payment_StockReservedEventQueue}")); //heventi hangi adrese gonderecegimizi belirleriz
             await sendEndpoint.Send(stockReservedEvent);
-
+            Console.WriteLine("Stok İşlemleri Başarılı");
         }
         else
         {
@@ -65,8 +65,9 @@ public class OrderCreatedEventConsumer : IConsumer<OrderCreatedEvent>
 
             //uygun olan publish tipidir cunku farkli servisler tarafindan da isleme alinabilir ornegin log servisi gibi
             await _publishEndpoint.Publish(stockNotReservedEvent); //publish edildigi taktirde order api'de islenmelidur bu event.
+            Console.WriteLine("Stok İşlemleri Başarısız");
+
         }
 
-        return Task.CompletedTask;
     }
 }

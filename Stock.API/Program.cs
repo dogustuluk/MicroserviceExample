@@ -35,11 +35,11 @@ MongoDbService mongoDbService = scope.ServiceProvider.GetService<MongoDbService>
 var collection = mongoDbService.GetCollection<Stock.API.Models.Entities.Stock>();
 if (!(await collection.Find(a => true).AnyAsync()))
 {
-    await collection.InsertOneAsync(new() { ProductId = Guid.NewGuid(), Count = 2000 });
-    await collection.InsertOneAsync(new() { ProductId = Guid.NewGuid(), Count = 4000 });
-    await collection.InsertOneAsync(new() { ProductId = Guid.NewGuid(), Count = 2200 });
-    await collection.InsertOneAsync(new() { ProductId = Guid.NewGuid(), Count = 3200 });
-    await collection.InsertOneAsync(new() { ProductId = Guid.NewGuid(), Count = 700 });
+    await collection.InsertOneAsync(new() { ProductId = "3731C522-5A3D-8B41-AF12-F25686740341", Count = 2000 });
+    await collection.InsertOneAsync(new() { ProductId = "6F2EACBF-B1D7-8641-9DFF-4CF6823B0966", Count = 4000 });
+    await collection.InsertOneAsync(new() { ProductId = "B1DC3471-75E9-934A-B41D-BC43DC9B56D2", Count = 2200 });
+    await collection.InsertOneAsync(new() { ProductId = "179CB28B-91FE-BD42-A802-E11D8E2A68F3", Count = 3200 });
+    await collection.InsertOneAsync(new() { ProductId = "9BA6711D-AE04-094F-BE1C-0A30718C1507", Count = 700 });
 }
 // /seed data
 
