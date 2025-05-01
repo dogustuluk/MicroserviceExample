@@ -51,10 +51,11 @@ public class OrderController : ControllerBase
             {
                 Count = a.Count,
                 ProductId = a.ProductId
-            }).ToList()
+            }).ToList(),
+            TotalPrice = order.TotalPrice,
         };
 
-        //publish et
+        //publish et --> publish secmemizin sebebi; burada direkt event bazli bir modelleme yaptik yani bu eventi dinleyen herkes bu event'i yakalayabilir.
         await _publishEndpoint.Publish(orderCreatedEvent);
 
         return Ok();
