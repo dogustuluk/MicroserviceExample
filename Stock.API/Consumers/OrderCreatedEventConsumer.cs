@@ -11,11 +11,13 @@ public class OrderCreatedEventConsumer : IConsumer<OrderCreatedEvent>
 {
     IMongoCollection<Stock.API.Models.Entities.Stock> _stockCollection;
     readonly ISendEndpointProvider _sendEndpointProvider;
+    readonly IPublishEndpoint _publishEndpoint;
 
-    public OrderCreatedEventConsumer(MongoDbService mongoDbService, ISendEndpointProvider sendEndpointProvider)
+    public OrderCreatedEventConsumer(MongoDbService mongoDbService, ISendEndpointProvider sendEndpointProvider, IPublishEndpoint publishEndpoint)
     {
         _stockCollection = mongoDbService.GetCollection<Stock.API.Models.Entities.Stock>();
         _sendEndpointProvider = sendEndpointProvider;
+        _publishEndpoint = publishEndpoint;
     }
 
     public async Task Consume(ConsumeContext<OrderCreatedEvent> context)
@@ -54,6 +56,15 @@ public class OrderCreatedEventConsumer : IConsumer<OrderCreatedEvent>
         else
         {
             //sipariste urun id veya stok problemi varsa siparisi gecersiz kilmak icin islemler yapilir.
+            StockNotReservedEvent stockNotReservedEvent = new()
+            {
+                BuyerId = context.Message.BuyerId,
+                OrderId = context.Message.OrderId,
+                Message = "hata meydana geldi"
+            };
+
+            //uygun olan publish tipidir cunku farkli servisler tarafindan da isleme alinabilir ornegin log servisi gibi
+            await _publishEndpoint.Publish(stockNotReservedEvent); //publish edildigi taktirde order api'de islenmelidur bu event.
         }
 
         return Task.CompletedTask;
